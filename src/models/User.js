@@ -11,18 +11,17 @@ function InsertUsers(iddiscord, username){
     });
 }
 
-function SelectUser(where = 0, callback){
+async function SelectUser(where = 0, callback){
 
     //Vu que les clefs sont trop longue pour l'int on va transformer les int en varchar en bdd.
     var replace = where.toString(); //toString() permet de convertir un int en chaine de caractère
-    
-    db.query('SELECT * FROM `users` WHERE `iddiscord` = ?', [replace],
+
+    await db.query('SELECT * FROM `users` WHERE `iddiscord` = ?', [replace],
     function (err, results, fields) {
         if (err) throw err;
 
         var row = results[0]['iddiscord'];
-        var parseok = parseInt(row);
-        return parseok;
+        return parseInt(row).then(parseok => { return parseok });
     });
 }
 

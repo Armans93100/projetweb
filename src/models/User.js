@@ -1,4 +1,5 @@
 const { createPool } = require('mysql2/promise');
+const { promisify } = require('util');
 const testdb = require('../database/mysql_db');
 const db = testdb.dbconnect();
 
@@ -11,20 +12,17 @@ function InsertUsers(iddiscord, username){
     });
 }
 
-async function SelectUser(where = 0, callback){
+async function SelectFirstUser(where = 0){
+    return new Promise(function (resolve, reject){
 
-    //Vu que les clefs sont trop longue pour l'int on va transformer les int en varchar en bdd.
-    var replace = where.toString(); //toString() permet de convertir un int en chaine de caractère
-
-    await db.query('SELECT * FROM `users` WHERE `iddiscord` = ?', [replace],
-    function (err, results, fields) {
-        if (err) throw err;
-
-        var row = results[0]['iddiscord'];
-        return parseInt(row).then(parseok => { return parseok });
+        var replace = where.toString();
+        db.query('SELECT * FROM `users` WHERE `iddiscord` = ?', [replace], 
+        function (err, result, fields) {
+            if (err) throw err;
+                resolve(result[0]['iddiscord']);
+        });
     });
 }
 
-
 exports.InsertUsers = InsertUsers;
-exports.SelectUser = SelectUser;
+exports.SelectFirstUser = SelectFirstUser;

@@ -18,20 +18,24 @@ passport.use(new DiscordStrategy({
     scope: scopes
 
 }, async (accessToken, refreshToken, profile, done) => { //On vérifie les données si elles sont correct
+    
+    var finduser;
 
     try {
-        const findfirst = usersmodel.SelectUser(profile.id);
-        console.log("premier test"+usersmodel.SelectUser(profile.id));
+        usersmodel.SelectFirstUser("268801294343340033")
+            .then(result =>{ 
+                if(result === undefined){
 
-        findfirst.then(function(results){
-            if(results ==! undefined) {
-                console.log("Il est entrée dans le if "+results);
-            } else {
-                console.log("Il est entrée dans le else "+results);
-            }
-        });
-
-    } catch(err) {
+                    console.log("C'est passé dans le if "+ result);
+        
+                } else {
+        
+                    console.log("c'est passé dans le else "+ result);
+        
+                }
+            });
+        } 
+    catch(err) {
 
         console.log(err);
     }

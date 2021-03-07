@@ -10,24 +10,27 @@ const DiscordStrategy = require('./src/strategies/discordstrategy');
 
 //Mes routes
 const authRoute = require('./src/routes/auth');
+const dashboardRoute = require('./src/routes/dashboard');
 
-//Mon passport pour la connexion avec discord
+//On initialise mon passport pour la connexion avec discord
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 //Mes routes middleware
-app.use(session({
+app.use(session({ //La gestion de mes sessions via cookie
 
-    secret: "Ajout d'un secret aléatoire",
+    secret: 'FreezeCorleoneDondada',
     cookie: {
         maxAge: 60000 * 60 * 24
     },
-    saveUninitialized: false
+    saveUninitialized: false,
+    name: 'Cols_cops'
 
 }));
 
 app.use('/auth', authRoute); //Je lui indique que si je me retrouve sur cette route alors je doit la rediriger vers ma routes ./routes/auth
+app.use('/dashboard', dashboardRoute); //Je lui indique que si je me retrouve sur cette route alors je doit la rediriger vers ma routes ./routes/auth
 
 app.listen(PORT, () => {
 

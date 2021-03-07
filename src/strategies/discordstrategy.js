@@ -4,11 +4,25 @@ const DiscordStrategy = require('passport-discord').Strategy;
 const passport = require('passport');
 const testdb = require('../database/mysql_db');
 const usersmodel = require('../models/User');
-
 //Récupération des méthod
 const db = testdb.dbconnect();
 
-var scopes = ['identify', 'email', 'guilds', 'guilds.join']; // On va crée notre tableau pour le scope, si je veux intérargire avec ça va être plus simple.
+//Init du passport
+passport.serializeUser(function(user, done) {
+    console.log(user.id);
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id,done) => {
+    const user = await usersmodel.SelectFirstUser(id);
+
+   if(user)
+   console.log("deserializer"); 
+   done(null, user);
+});
+
+// On va crée notre tableau pour le scope, si je veux intérargire avec ça va être plus simple.
+var scopes = ['identify', 'guilds'];
 
 passport.use(new DiscordStrategy({
 
@@ -18,26 +32,28 @@ passport.use(new DiscordStrategy({
     scope: scopes
 
 }, async (accessToken, refreshToken, profile, done) => { //On vérifie les données si elles sont correct
-    
-    var finduser;
 
-    try {
-        usersmodel.SelectFirstUser("268801294343340033")
-            .then(result =>{ 
-                if(result === undefined){
+    try {//On lance notre try and catch pour gérer les erreurs.
 
+        //Nos variable qui vont rendre le code un peu plus propre.
+        var idd = profile.id;
+        var name = profile.username;
+
+        usersmodel.SelectFirstUser(idd)//Je vérifie si le compte existe en bdd
+            .then(result =>{
                     console.log("C'est passé dans le if "+ result);
-        
-                } else {
-        
-                    console.log("c'est passé dans le else "+ result);
-        
-                }
+                    console.log(result);
+                    done(null, result);
+            }).catch((message) =>{
+                console.log(message);
+                const saveUser = usersmodel.InsertUsers(idd, name);
+                done(null, saveUser);
             });
-        } 
+        }
     catch(err) {
 
         console.log(err);
+        done(err, null);
     }
 }));
 
